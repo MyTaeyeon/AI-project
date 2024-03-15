@@ -1,4 +1,4 @@
-# List of AI project (PTIT's course)
+# LDanh sách các dự án
 1. Sử dụng thuật toán tìm kiếm A* để tìm ra đường đi ngắn nhất từ điểm xuất phát đến điểm đích trong một lưới không gian 2 chiều có vật cản.
 2. Sử dụng thuật toán DFS để sinh đường đi mê cung
 3. Ứng dụng thuật toán best first search vào bài toán tìm đường đi giữa hai điểm trên bản đồ.
@@ -15,5 +15,3 @@
 14. Thuật toán ANN cho bài toán nhận diện biển số xe
 15. Sử dụng phương pháp lọc cộng tác cho bài toán gợi ý sản phẩm
 16. Sử dụng phương pháp lọc theo nội dung ứng dụng cho bài toán gợi ý sản phẩm
-
-(Do minh qua luoi chuyen no lai thanh tieng Anh)
