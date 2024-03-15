@@ -2,7 +2,7 @@ import pygame, sys, random
 
 pygame.init()
 clock = pygame.time.Clock()
-fps = 150
+fps = 60
 
 size = (width, height) = (700, 700)
 screen = pygame.display.set_mode(size)
@@ -117,7 +117,7 @@ solver = Solver(maze_size, [0, 0], goal)
 solver.draw(path)
 
 while True:
-    clock.tick(60)
+    clock.tick(fps)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
