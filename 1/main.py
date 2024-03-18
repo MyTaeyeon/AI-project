@@ -1,4 +1,4 @@
-import pygame, sys, color, Map, heapq
+import pygame, sys, color, Map
 
 pygame.init()
 clock = pygame.time.Clock()
