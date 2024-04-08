@@ -229,7 +229,7 @@ int main() {
         }
         else {
             minimax(1, true);
-            int x = bestMove / sz; y = bestMove % sz;
+            int x = bestMove / sz, y = bestMove % sz;
             board[bestMove] = COMPUTER;
             cout << x << " " << y << endl;
         }
