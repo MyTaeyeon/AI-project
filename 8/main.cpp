@@ -24,16 +24,16 @@ int maxScoreCom = 0, maxScoreHuman = 0;
 // give score for each cell in the board
 int caro[1024];
 
-int max_depth = 6;
+int max_depth = 10;
 bool game_over = false;
 
 short AttackScores[] = {0, 2, 18, 162, 1400};
 short DefendScores[] = {0, 1,  9,  81,  729};
 
-short exdirections[4]; /* 5 cells in row,
-                          5 cells in column,
-                          5 cells in diagonal from left,
-                          5 cells in diagonal from right  
+short exdirections[4]; /* row, 
+                          column, 
+                          diagonal from left, 
+                          diagonal from right  
                         */
 
 int max_element(int a[], int length) {
@@ -63,25 +63,6 @@ void init(short n) {
         board[i+1] = -1;
     }
     for (short i = sz*(sz-1); i < sz*sz; i++) board[i] = -1;
-}
-
-// draw the board game 
-void Render() {
-    for (int i = sz; i < sz*(sz-1); i++) {
-        switch (board[i])
-        {
-        case 0:
-            cout << "|   ";break;
-        case 1:
-            cout << "| X ";break;
-        case 2:
-            cout << "| O ";break;
-        default:
-            break;
-        }
-        
-        if (i % sz == sz-1) cout << "|\n";
-    }
 }
 
 // Check to know the game is over
@@ -225,6 +206,8 @@ void minimax(int depth, bool is_max) {
 int main() {
     init(15);
 
+    int _turn = HUMAN;
+
     while (!game_over)
     {
         // input: row x column y
@@ -240,6 +223,16 @@ int main() {
         // game_over = isWin(COMPUTER);
 
         // if you wanna computer play first then call minimax before you get input from human
+        if (_turn == HUMAN) {
+            int x, y; cin >> x >> y;
+            board[x*sz+y] = HUMAN;
+        }
+        else {
+            minimax(1, true);
+            int x = bestMove / sz; y = bestMove % sz;
+            board[bestMove] = COMPUTER;
+            cout << x << " " << y << endl;
+        }
     }
     return 0;
 }
