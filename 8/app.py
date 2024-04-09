@@ -21,26 +21,10 @@ chrome_options.add_argument(f"user-data-dir={chrome_profile_path}")
 # activate your chrome
 driver = webdriver.Chrome(options=chrome_options)
 
-driver.get("https://papergames.io/vi/c%E1%BB%9D-caro")
-
-# wait for the web loaded completely
-time.sleep(3)
-
-# click the play button
-button_play_online = driver.find_element(By.XPATH, "//button[contains(text(),' Chơi với robot ')]")
-button_play_online.click()
-
-# time for you type username and click continue
-time.sleep(5)
-
-# find and click on button 'contimue'
-button_continue = driver.find_element(By.XPATH, "//button[contains(text(),'Tiếp tục')]")
-button_continue.click()
-
-time.sleep(5)
+driver.get("https://papergames.io/en/gomoku") 
 
 game_over = False
-nMask = [[0]*15 for _ in range(15)]
+lastMove = -1
 
 def getInput():
     # find all the cell
@@ -54,32 +38,50 @@ def getInput():
             td_elements = soup.find_all("td")
 
             for idx, td in enumerate(td_elements):
-                if len(td['class']) == 2:
-                    if nMask[idx//15][idx%15] == 0:
-                        return idx
+                if idx == lastMove: continue
+                if len(td['class']) == 2:    
+                    svg_tags = td.find_all('svg') 
+                    if len(svg_tags) == 1:
+                        
+                        circle_tags = svg_tags[0].find_all('circle') 
+                        
+                        if len(circle_tags) == 2:
+                            return idx
     else:
         print("Không tìm thấy bảng.")
         return -2
     return -1
 
+n = input('com play first?[y/n]').strip()
+if n == 'y':
+    process.stdin.write("2\n")
+    process.stdin.flush()
+    output = list(map(int, process.stdout.readline().strip().split()))
+
+    class_att = f'cell-{output[0]-1}-{output[1]-1}'
+    td_element = driver.find_element(By.CLASS_NAME, class_att)
+    td_element.click()
+    lastMove = (output[0]-1)*15+output[1]-1
+    print('clicked!')
+else:
+    process.stdin.write("1\n")
+
 # sent input for cpp program
 while game_over == False:
     inp = -1
     while inp == -1:
-        time.sleep(2)
+        time.sleep(3)
         inp = getInput()
 
     if inp == -2:
         break
 
-    nMask[inp//15][inp%15] = 1
     inp = str(inp // 15 + 1) + " " + str(inp % 15 + 1)
     print('Input:', inp)
 
     process.stdin.write(inp + "\n")
     process.stdin.flush()
     output = list(map(int, process.stdout.readline().strip().split()))
-    nMask[output[0]-1][output[1]-1] = 2
 
     print('Output: ', output)
 
@@ -87,8 +89,8 @@ while game_over == False:
     class_att = f'cell-{output[0]-1}-{output[1]-1}'
     td_element = driver.find_element(By.CLASS_NAME, class_att)
     td_element.click()
+    lastMove = (output[0]-1)*15+output[1]-1
     print('clicked!')
-    time.sleep(3)
 
 # close the stream and wait the process close
 process.stdin.close()

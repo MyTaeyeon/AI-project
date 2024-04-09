@@ -24,7 +24,7 @@ int maxScoreCom = 0, maxScoreHuman = 0;
 // give score for each cell in the board
 int caro[1024];
 
-int max_depth = 10;
+int max_depth = 16;
 bool game_over = false;
 
 short AttackScores[] = {0, 2, 18, 162, 1400};
@@ -141,7 +141,7 @@ void evaluation(int _turn) {
     giveScore(exdirections[3], _turn);
 }
 
-void minimax(int depth, bool is_max) {
+void minimax(int depth, int alpha, int beta, bool is_max) {
     if (depth > max_depth) return;
 
     if (is_max) {
@@ -167,12 +167,14 @@ void minimax(int depth, bool is_max) {
                 break;
             }
 
-            minimax(depth+1, false);
+            minimax(depth+1, alpha, beta, false);
             board[temp_Com.x] = 0;
             if (max < maxScoreCom) {
                 if (depth == 1) bestMove = _Com[i].x;
                 max = maxScoreCom;
             }
+            if (alpha < max) alpha = max;
+            if (beta <= alpha) break;
         }
         maxScoreHuman = max;
     }
@@ -195,9 +197,11 @@ void minimax(int depth, bool is_max) {
                 break;
             }
             
-            minimax(depth+1, true);
+            minimax(depth+1, alpha, beta, true);
             board[temp_human.x] = 0;
             if (min > _Human[i]._score) min = _Human[i]._score;
+            if (beta < min) beta = min;
+            if (beta <= alpha) break;
         }
         maxScoreCom = min;
     }
@@ -207,6 +211,12 @@ int main() {
     init(15);
 
     int _turn = HUMAN;
+    cin >> _turn;
+    if (_turn == COMPUTER) {
+        board[8*sz+8] = COMPUTER;
+        cout << "8 8" << endl;
+        _turn = HUMAN;
+    }
 
     while (!game_over)
     {
@@ -226,12 +236,14 @@ int main() {
         if (_turn == HUMAN) {
             int x, y; cin >> x >> y;
             board[x*sz+y] = HUMAN;
+            _turn = COMPUTER;
         }
         else {
-            minimax(1, true);
+            minimax(1, 99999, -99999, true);
             int x = bestMove / sz, y = bestMove % sz;
             board[bestMove] = COMPUTER;
             cout << x << " " << y << endl;
+            _turn = HUMAN;
         }
     }
     return 0;
