@@ -4,11 +4,6 @@ from bs4 import BeautifulSoup
 import time
 import subprocess
 
-cpp_program = "./main"
-
-# open bash to run C++ program
-process = subprocess.Popen(cpp_program, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-
 # path to Chrome profile in Linux
 # in Window: C:\Users\YourUsername\AppData\Local\Google\Chrome\User Data\ProfileName
 # in MacOS, its maybe located at: ~/Library/Application Support/Google/Chrome/ProfileName
@@ -23,80 +18,89 @@ driver = webdriver.Chrome(options=chrome_options)
 
 driver.get("https://papergames.io/en/gomoku") 
 
-game_over = False
-lastMove = -1
+while True:
+    cpp_program = "./main"
 
-def getInput():
-    # find all the cell
-    table = driver.find_elements(By.CLASS_NAME, 'table-board')
+    # open bash to run C++ program
+    process = subprocess.Popen(cpp_program, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-    if table:
-        for tb in table:
-            html = tb.get_attribute("outerHTML")
+    game_over = False
+    lastMove = -1
 
-            soup = BeautifulSoup(html, "html.parser")
-            td_elements = soup.find_all("td")
+    def getInput():
+        # find all the cell
+        table = driver.find_elements(By.CLASS_NAME, 'table-board')
 
-            for idx, td in enumerate(td_elements):
-                if idx == lastMove: continue
-                if len(td['class']) == 2:    
-                    svg_tags = td.find_all('svg') 
-                    if len(svg_tags) == 1:
-                        
-                        circle_tags = svg_tags[0].find_all('circle') 
-                        
-                        if len(circle_tags) == 2:
-                            return idx
+        if table:
+            for tb in table:
+                html = tb.get_attribute("outerHTML")
+
+                soup = BeautifulSoup(html, "html.parser")
+                td_elements = soup.find_all("td")
+
+                for idx, td in enumerate(td_elements):
+                    if idx == lastMove: continue
+                    if len(td['class']) == 2:    
+                        svg_tags = td.find_all('svg') 
+                        if len(svg_tags) == 1:
+                            
+                            circle_tags = svg_tags[0].find_all('circle') 
+                            
+                            if len(circle_tags) == 2:
+                                return idx
+        else:
+            print("Không tìm thấy bảng.")
+            return -2
+        return -1
+
+    n = input('com play first?[y/n]').strip()
+    if n == 'y':
+        process.stdin.write("2\n")
+        process.stdin.flush()
+        output = list(map(int, process.stdout.readline().strip().split()))
+
+        class_att = f'cell-{output[0]-1}-{output[1]-1}'
+        td_element = driver.find_element(By.CLASS_NAME, class_att)
+        td_element.click()
+        lastMove = (output[0]-1)*15+output[1]-1
+        print('clicked!')
     else:
-        print("Không tìm thấy bảng.")
-        return -2
-    return -1
+        process.stdin.write("1\n")
 
-n = input('com play first?[y/n]').strip()
-if n == 'y':
-    process.stdin.write("2\n")
-    process.stdin.flush()
-    output = list(map(int, process.stdout.readline().strip().split()))
+    # sent input for cpp program
+    while game_over == False:
+        inp = -1
+        while inp == -1:
+            time.sleep(3)
+            inp = getInput()
 
-    class_att = f'cell-{output[0]-1}-{output[1]-1}'
-    td_element = driver.find_element(By.CLASS_NAME, class_att)
-    td_element.click()
-    lastMove = (output[0]-1)*15+output[1]-1
-    print('clicked!')
-else:
-    process.stdin.write("1\n")
+        if inp == -2:
+            break
 
-# sent input for cpp program
-while game_over == False:
-    inp = -1
-    while inp == -1:
-        time.sleep(3)
-        inp = getInput()
+        inp = str(inp // 15 + 1) + " " + str(inp % 15 + 1)
+        print('Input:', inp)
 
-    if inp == -2:
-        break
+        process.stdin.write(inp + "\n")
+        process.stdin.flush()
+        output = list(map(int, process.stdout.readline().strip().split()))
 
-    inp = str(inp // 15 + 1) + " " + str(inp % 15 + 1)
-    print('Input:', inp)
+        print('Output: ', output)
 
-    process.stdin.write(inp + "\n")
-    process.stdin.flush()
-    output = list(map(int, process.stdout.readline().strip().split()))
+        # AI turn
+        class_att = f'cell-{output[0]-1}-{output[1]-1}'
+        td_element = driver.find_element(By.CLASS_NAME, class_att)
+        td_element.click()
+        lastMove = (output[0]-1)*15+output[1]-1
+        print('clicked!')
 
-    print('Output: ', output)
+    # close the stream and wait the process close
+    process.stdin.close()
+    process.stdout.close()
+    process.stderr.close()
+    process.wait()
 
-    # AI turn
-    class_att = f'cell-{output[0]-1}-{output[1]-1}'
-    td_element = driver.find_element(By.CLASS_NAME, class_att)
-    td_element.click()
-    lastMove = (output[0]-1)*15+output[1]-1
-    print('clicked!')
-
-# close the stream and wait the process close
-process.stdin.close()
-process.stdout.close()
-process.stderr.close()
-process.wait()
+    g = input('press q to exit.').strip()
+    if g == 'q': break
 
 # close the driver
 driver.close()

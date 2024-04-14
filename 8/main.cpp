@@ -24,11 +24,11 @@ int maxScoreCom = 0, maxScoreHuman = 0;
 // give score for each cell in the board
 int caro[1024];
 
-int max_depth = 16;
+int max_depth = 12;
 bool game_over = false;
 
-short AttackScores[] = {0, 2, 18, 162, 1400};
-short DefendScores[] = {0, 1,  9,  81,  729};
+short AttackScores[] = {0, 2, 18, 162, 546};
+short DefendScores[] = {0, 1, 9, 100, 400};
 
 short exdirections[4]; /* row, 
                           column, 
@@ -129,12 +129,12 @@ void giveScore(int dir, int _turn) {
 void evaluation(int _turn) {
     memset(caro, 0, sizeof(caro));
     caro[(sz+1)*sz/2] = 2;
-    for (short i = 0; i < sz-2; ++i) caro[i] = -49999;
-    for (short i = sz-1; i < sz*(sz-1); i += sz) {
-        caro[i] = -49999;
-        caro[i+1] = -49999;
-    }
-    for (short i = sz*(sz-1); i < sz*sz; i++) caro[i] = -49999;
+    // for (short i = 0; i < sz-2; ++i) caro[i] = -49999;
+    // for (short i = sz-1; i < sz*(sz-1); i += sz) {
+    //     caro[i] = -49999;
+    //     caro[i+1] = -49999;
+    // }
+    // for (short i = sz*(sz-1); i < sz*sz; i++) caro[i] = -49999;
     giveScore(exdirections[0], _turn);
     giveScore(exdirections[1], _turn);
     giveScore(exdirections[2], _turn);
@@ -148,15 +148,15 @@ void minimax(int depth, int alpha, int beta, bool is_max) {
         int max = -50000;
         evaluation(COMPUTER);
         Point *_Com;
-        _Com = new Point[3];
+        _Com = new Point[5];
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 5; i++) {
             _Com[i].x = max_element(caro, sz*sz);
             _Com[i]._score = caro[_Com[i].x];
             caro[_Com[i].x] = 0;
         }
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 5; i++) {
             Point temp_Com = _Com[i];
             board[temp_Com.x] = COMPUTER;
 
@@ -182,13 +182,13 @@ void minimax(int depth, int alpha, int beta, bool is_max) {
         int min = 50000;
         evaluation(HUMAN);
         Point *_Human;
-        _Human = new Point[3];
-        for (int i = 0; i < 3; i++) {
+        _Human = new Point[5];
+        for (int i = 0; i < 5; i++) {
             _Human[i].x = min_element(caro, sz*sz);
             _Human[i]._score = caro[_Human[i].x];
             caro[_Human[i].x] = 0;
         }
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 5; i++) {
             Point temp_human = _Human[i];
             board[temp_human.x] = HUMAN;
             if (isWin(HUMAN)) {
