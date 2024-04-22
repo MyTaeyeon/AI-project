@@ -3,11 +3,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 X = np.nan
 R = np.array([
-    [5, 4, X, 1, 2, 1], #  
-    [4, X, 3, 1, 1, 2], #
-    [X, 5, 5, X, 3, 3], # item
-    [2, X, 1, 4, 5, 4], # 
-    [1, 2, 1, X, 5, 4]  #
+    [5, 5, 2, 0, 1, X, X], #  
+    [4, X, X, 0, X, 2, X], #
+    [X, 4, 1, X, X, 1, 1], # item
+    [2, 2, 3, 4, 4, X, 4], # 
+    [2, 0, 4, X, X, X, 5]  #
    #       user 
 ])
 
@@ -16,33 +16,30 @@ class CF(object):
         self.ori_data = R.copy()
         self.data = R.copy()
         self.n, self.m = self.data.shape
-        self.kneighbors = 2
+        self.kneighbors = 2 # set kneighbor here
     
     def __normalize(self):
-        self.col_means = np.nanmean(self.data, axis=0)
+        self.row_means = np.nanmean(self.data, axis=1)
         nan_indices = np.isnan(self.data)
-        self.data -= self.col_means
+        self.data -= self.row_means[:, np.newaxis]
         self.data[nan_indices] = 0
 
     def __similarity(self):
-        self.S = cosine_similarity(self.data.T)
+        self.S = cosine_similarity(self.data)
 
     def fit(self):
         self.__normalize()
         self.__similarity()
     
     def predict(self, u, i):
-        similiar_users = np.argsort(self.S[u])[::-1][1:self.kneighbors+1]
-        users_with_rating = [v for v in similiar_users if not np.isnan(self.ori_data[i, v])]
+        similiar_items = np.argsort(self.S[i])[::-1][1:self.kneighbors+1]
+        rated_items = [v for v in similiar_items if not np.isnan(self.ori_data[v, u])]
 
-        if len(users_with_rating) == 0:
+        if len(rated_items) == 0:
             return -1
         
-        weighted_sum = np.sum([self.S[u, v] * self.data[i, v] for v in users_with_rating])
-        sum_of_weights = np.sum([np.abs(self.S[u, v]) for v in users_with_rating])
-
-        if sum_of_weights == 0:
-            return -1
+        weighted_sum = np.sum([self.S[i, v] * self.data[v, u] for v in rated_items])
+        sum_of_weights = np.sum([np.abs(self.S[i, v]) for v in rated_items]) + 1e-8
         
         return weighted_sum / sum_of_weights
 
@@ -57,5 +54,4 @@ class CF(object):
 
 cf = CF(R)
 cf.fit()
-
-print(cf.recommend(1))
+print(cf.predict(0, 2))
