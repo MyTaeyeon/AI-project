@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recommendation System</title>
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
 </head>
 <body>
@@ -18,6 +18,11 @@
             <input class="search-input" type="search" placeholder="Search">
         </div>
     </form>
+    <ul>
+        {% for item in recommended_items %}
+            <li>{{ item }}</li>
+        {% endfor %}
+    </ul>
 
 </body>
 </html>
