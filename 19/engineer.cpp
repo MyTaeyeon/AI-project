@@ -86,7 +86,7 @@ void backtracking(short row, short column) {
 
 void solve() {
     backtracking(0, 0);
-    std::cout << "Cannot solve the problem!";
+    throw std::runtime_error("Cannnot solve the problem!");
 }
 
 int main() {
