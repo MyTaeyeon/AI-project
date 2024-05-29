@@ -15,7 +15,7 @@ url = 'https://killersudoku.com/'
 driver = webdriver.Chrome(options=chrome_options)
 driver.get(url)
 
-time.sleep(5)
+time.sleep(6)
 print("Start!")
 
 td_elements = None  

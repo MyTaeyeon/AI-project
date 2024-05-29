@@ -7,7 +7,7 @@ import subprocess
 # path to Chrome profile in Linux
 # in Window: C:\Users\YourUsername\AppData\Local\Google\Chrome\User Data\ProfileName
 # in MacOS, its maybe located at: ~/Library/Application Support/Google/Chrome/ProfileName
-chrome_profile_path = '/home/nguyen/.config/google-chrome/Default'
+chrome_profile_path = '/home/wonyoung/.config/google-chrome/Default'
 
 # create Chrome profile's option 
 chrome_options = webdriver.ChromeOptions()
@@ -19,7 +19,7 @@ driver = webdriver.Chrome(options=chrome_options)
 driver.get("https://papergames.io/en/gomoku") 
 
 while True:
-    cpp_program = "./main"
+    cpp_program = "./8/main"
 
     # open bash to run C++ program
     process = subprocess.Popen(cpp_program, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)

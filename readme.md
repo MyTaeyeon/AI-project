@@ -18,3 +18,4 @@
 17. Bot phá đảo game pikachu (https://gamevui.vn/pikachu/game)
 18. Bot chơi 10 fast finger chế độ multi (https://10ff.net/)
 19. Bot chơi sudoku (https://killersudoku.com/)
+20. cube 3D in terminal
